@@ -26,8 +26,7 @@ contract TontineOfKilpatrick {
     function TontineOfKilpatrick(uint _contribution, uint _contributionInterval) {
         contribution = _contribution;
         contributionInterbal = _contributionInterval;
-        members[members.length] = Member(msg.sender, false, 0);
-
+        members[members.length] = Member(msg.sender, false, now, 0);
     }
 
     function nominateMember(address nominee) {
