@@ -51,8 +51,10 @@ contract TontineOfKilpatrick {
 
     }
 
-    function exitTontine() { // Put a reentrancy bug in here
-
+    function exitTontine() is membersOnly {
+        Member member = findMember(msg.sender);
+        member.memberAddress.call.value(member.totalContribution)();
+        member.totalContribution = 0;
     }
 
     function findMember(address addr) {
