@@ -66,6 +66,16 @@ contract TontineOfKilpatrick {
         return false;
     }
 
+    function findNominee(address addr) {
+        uint index = 0;
+        while(index < nominees.length) {
+            if(nominees[index].nomineeAddress == addr) {
+                return nominees[index];;
+            }
+        }
+        return false;
+    }
+
     function isMember(address addr) {
         uint index = 0;
         while(index < members.length) {
