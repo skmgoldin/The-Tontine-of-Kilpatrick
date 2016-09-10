@@ -29,8 +29,8 @@ contract TontineOfKilpatrick {
         members[members.length] = Member(msg.sender, false, now, 0);
     }
 
-    function nominateMember(address nominee) {
-
+    function nominateMember(address nomineeAddr) is membersOnly {
+        nominees[nominees.length] = Nominee(nomineeAddr);
     }
 
     function voteForNominee(address nominee) {
