@@ -33,8 +33,12 @@ contract TontineOfKilpatrick {
         nominees[nominees.length] = Nominee(nomineeAddr);
     }
 
-    function voteForNominee(address nominee) {
-
+    function voteForNominee(address nomineeAddr) is membersOnly {
+        nominee = findNominee(nomineeAddr);
+        nominee.sponsors[nominee.sponsors.length] = msg.sender;
+        if(nominee.sponsors.length > members.length/2) {
+            members[members.length] = Member(nominee.nomineeAddress, false, now, 0);
+        }
     }
 
     function makePayment() is membersOnly {
