@@ -37,7 +37,7 @@ contract TontineOfKilpatrick {
 
     function nominateMember(address nomineeAddr) membersOnly {
         Nominee nominee = findNominee(nomineeAddr);
-        if(nominee.alive == 1) throw;
+        if(nominee.alive == 1) throw; // Nominee already added
         nominee.addr = nomineeAddr;
         nominee.alive = 1;
         nominees.push(nominee);
