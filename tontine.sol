@@ -19,6 +19,7 @@ contract TontineOfKilpatrick {
     Member[] members;
     Nominee[] nominees;
 
+    uint livingMembers;
     uint contribution;
     uint contributionInterval;
 
@@ -31,6 +32,7 @@ contract TontineOfKilpatrick {
         contribution = _contribution;
         contributionInterval = _contributionInterval;
         members[members.length] = Member(msg.sender, false, now, 0, 1);
+        livingMembers = livingMembers + 1;
     }
 
     function nominateMember(address nomineeAddr) membersOnly {
@@ -46,6 +48,7 @@ contract TontineOfKilpatrick {
         nominee.sponsors[nominee.sponsors.length] = findMember(msg.sender);
         if(nominee.sponsors.length > members.length/2) {
             members[members.length] = Member(nominee.addr, false, now, 0, 1);
+            livingMembers = livingMembers + 1;
         }
     }
 
@@ -82,10 +85,13 @@ contract TontineOfKilpatrick {
         Member memory member = findMember(msg.sender);
         member.addr.call.value(member.totalContribution)();
         member.totalContribution = 0;
+        member.alive = 0;
+        livingMembers = livingMembers - 1;
     }
 
     function removeMember(Member member) internal {
         member.alive = 0;
+        livingMembers = livingMembers - 1;
     }
 
     function findMember(address addr) internal returns (Member storage) {
