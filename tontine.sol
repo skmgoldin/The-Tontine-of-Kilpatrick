@@ -3,13 +3,13 @@ pragma solidity ^0.4.1;
 contract TontineOfKilpatrick {
 
     struct Nominee {
-        address nomineeAddress;
+        address addr;
         Member[] sponsors;
         uint init;
     }
 
     struct Member {
-        address memberAddress;
+        address addr;
         bool isOnProbation;
         uint lastContribution;
         uint totalContribution;
@@ -36,7 +36,7 @@ contract TontineOfKilpatrick {
     function nominateMember(address nomineeAddr) membersOnly {
         Nominee nominee = findNominee(nomineeAddr);
         if(nominee.init == 1) throw;
-        nominee.nomineeAddress = nomineeAddr;
+        nominee.addr = nomineeAddr;
         nominee.init = 1;
         nominees.push(nominee);
     }
@@ -45,7 +45,7 @@ contract TontineOfKilpatrick {
         Nominee nominee = findNominee(nomineeAddr);
         nominee.sponsors[nominee.sponsors.length] = findMember(msg.sender);
         if(nominee.sponsors.length > members.length/2) {
-            members[members.length] = Member(nominee.nomineeAddress, false, now, 0, 1);
+            members[members.length] = Member(nominee.addr, false, now, 0, 1);
         }
     }
 
@@ -65,14 +65,14 @@ contract TontineOfKilpatrick {
 
     function exitTontine() membersOnly {
         Member memory member = findMember(msg.sender);
-        member.memberAddress.call.value(member.totalContribution)();
+        member.addr.call.value(member.totalContribution)();
         member.totalContribution = 0;
     }
 
     function findMember(address addr) internal returns (Member storage) {
         uint index = 0;
         while(index < members.length) {
-            if(members[index].memberAddress == addr) {
+            if(members[index].addr == addr) {
                 return members[index];
             }
         }
@@ -83,7 +83,7 @@ contract TontineOfKilpatrick {
     function findNominee(address addr) internal returns (Nominee storage) {
         uint index = 0;
         while(index < nominees.length) {
-            if(nominees[index].nomineeAddress == addr) {
+            if(nominees[index].addr == addr) {
                 return nominees[index];
             }
         }
@@ -94,7 +94,7 @@ contract TontineOfKilpatrick {
     function isMember(address addr) returns (bool) {
         uint index = 0;
         while(index < members.length) {
-            if(members[index].memberAddress == addr) {
+            if(members[index].addr == addr) {
                 return true;
             }
         }
