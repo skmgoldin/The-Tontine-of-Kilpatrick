@@ -54,12 +54,9 @@ contract TontineOfKilpatrick {
             throw;
         }
 
-        Member memory member;
-        if(isMember(msg.sender)) {
-            member = findMember(msg.sender);
-            member.lastContribution = now;
-            member.totalContribution += msg.value;
-        }
+        Member member = findMember(msg.sender);
+        member.lastContribution = now;
+        member.totalContribution += msg.value;
 
     }
 
