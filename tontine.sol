@@ -5,7 +5,7 @@ contract TontineOfKilpatrick {
     struct Nominee {
         address addr;
         Member[] sponsors;
-        uint init;
+        uint alive;
     }
 
     struct Member {
@@ -13,7 +13,7 @@ contract TontineOfKilpatrick {
         bool isOnProbation;
         uint lastContribution;
         uint totalContribution;
-        uint init;
+        uint alive;
     }
 
     Member[] members;
@@ -35,9 +35,9 @@ contract TontineOfKilpatrick {
 
     function nominateMember(address nomineeAddr) membersOnly {
         Nominee nominee = findNominee(nomineeAddr);
-        if(nominee.init == 1) throw;
+        if(nominee.alive == 1) throw;
         nominee.addr = nomineeAddr;
-        nominee.init = 1;
+        nominee.alive = 1;
         nominees.push(nominee);
     }
 
@@ -53,8 +53,26 @@ contract TontineOfKilpatrick {
         if(msg.value != contribution) {
             throw;
         }
-
+        
         Member member = findMember(msg.sender);
+
+        // Member has missed more than two payment intervals, or is on probation
+        // and has missed an additional payment interval
+        if(now - (contributionInterval * 2) > member.lastContribution ||
+           member.isOnProbation && now - contributionInterval >
+           member.lastContribution) {
+            removeMember(member);
+            msg.sender.send(msg.value);
+            return;
+        }
+
+        // Member is late on payment. Put them on probation.
+        if(!member.isOnProbation &&
+           now - contributionInterval > member.lastContribution &&
+           now - contributionInterval * 2 < member.lastContribution) {
+            member.isOnProbation = true; 
+        }
+
         member.lastContribution = now;
         member.totalContribution += msg.value;
 
@@ -64,6 +82,10 @@ contract TontineOfKilpatrick {
         Member memory member = findMember(msg.sender);
         member.addr.call.value(member.totalContribution)();
         member.totalContribution = 0;
+    }
+
+    function removeMember(Member member) internal {
+        member.alive = 0;
     }
 
     function findMember(address addr) internal returns (Member storage) {
