@@ -46,7 +46,7 @@ contract TontineOfKilpatrick {
     function voteForNominee(address nomineeAddr) membersOnly {
         Nominee nominee = findNominee(nomineeAddr);
         nominee.sponsors[nominee.sponsors.length] = findMember(msg.sender);
-        if(nominee.sponsors.length > members.length/2) {
+        if(nominee.sponsors.length > livingMembers/2) { // Bug here because sponsors can die
             members[members.length] = Member(nominee.addr, false, now, 0, 1);
             livingMembers = livingMembers + 1;
         }
@@ -79,6 +79,24 @@ contract TontineOfKilpatrick {
         member.lastContribution = now;
         member.totalContribution += msg.value;
 
+    }
+
+    function claimPayout() membersOnly {
+        uint i;
+        uint payout = 0;
+        while(i < members.length) {
+            Member member = members[i];
+            payout += member.totalContribution;
+            if(member.alive == 1 && member.addr != msg.sender) {
+                if(now - (contributionInterval * 2) > member.lastContribution) {
+                    removeMember(member);
+                }
+                else {
+                    return;
+                }
+            }
+        }
+        msg.sender.send(payout);
     }
 
     function exitTontine() membersOnly {
